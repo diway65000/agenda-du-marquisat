@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Marquisat">
 <meta name="description" content="Agenda des événements du Marquisat - Hautes-Pyrénées">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/agenda-marquisat/manifest.json">
 <title>Agenda du Marquisat</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
@@ -1225,7 +1225,7 @@ function demarrerEcouteNtfy() {
         new Notification(data.title || 'Agenda du Marquisat', {
           body: data.message || '',
           icon: 'icon-192.png',
-          data: { url: 'https://agendadumarquisat.netlify.app' }
+          data: { url: 'https://diway65000.github.io/agenda-marquisat' }
         });
       }
     } catch(err) {}
@@ -1289,7 +1289,7 @@ if (isIOS && !isInStandaloneMode && !localStorage.getItem('install-ignore')) {
 
 // ─── SERVICE WORKER ───────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('/agenda-marquisat/sw.js').catch(() => {});
 }
 
 // Démarrer l'écoute ntfy si déjà abonné
