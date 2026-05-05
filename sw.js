@@ -1,5 +1,6 @@
-const CACHE = 'marquisat-v3';
-const ASSETS = ['/', '/index.html', '/manifest.json'];
+const CACHE = 'marquisat-v4';
+const BASE = '/agenda-marquisat';
+const ASSETS = [BASE + '/', BASE + '/index.html', BASE + '/manifest.json'];
 const NTFY_TOPIC = 'agendadumarquisat';
 
 self.addEventListener('install', e => {
@@ -14,17 +15,17 @@ self.addEventListener('activate', e => {
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
-  // Démarrer l'écoute ntfy depuis le Service Worker
   demarrerNtfy();
 });
 
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('googleapis.com') ||
       e.request.url.includes('cloudinary.com') ||
-      e.request.url.includes('ntfy.sh')) return;
+      e.request.url.includes('ntfy.sh') ||
+      e.request.url.includes('docs.google.com')) return;
   e.respondWith(
     caches.match(e.request).then(cached =>
-      cached || fetch(e.request).catch(() => caches.match('/index.html'))
+      cached || fetch(e.request).catch(() => caches.match(BASE + '/index.html'))
     )
   );
 });
@@ -34,15 +35,14 @@ self.addEventListener('notificationclick', e => {
   e.waitUntil(
     clients.matchAll({ type: 'window' }).then(list => {
       for (const client of list) {
-        if (client.url.includes('agendadumarquisat') && 'focus' in client)
+        if (client.url.includes('diway65000.github.io') && 'focus' in client)
           return client.focus();
       }
-      return clients.openWindow('https://agendadumarquisat.netlify.app');
+      return clients.openWindow('https://diway65000.github.io/agenda-marquisat');
     })
   );
 });
 
-// Écoute ntfy en SSE depuis le Service Worker (fonctionne en arrière-plan)
 function demarrerNtfy() {
   try {
     const es = new EventSource('https://ntfy.sh/' + NTFY_TOPIC + '/sse');
@@ -52,18 +52,14 @@ function demarrerNtfy() {
         if (data.event === 'message') {
           self.registration.showNotification(data.title || 'Agenda du Marquisat', {
             body: data.message || '',
-            icon: '/icon-192.png',
-            badge: '/icon-192.png',
+            icon: BASE + '/icon-192.png',
+            badge: BASE + '/icon-192.png',
             vibrate: [200, 100, 200],
-            data: { url: 'https://agendadumarquisat.netlify.app' }
+            data: { url: 'https://diway65000.github.io/agenda-marquisat' }
           });
         }
       } catch(err) {}
     };
-    es.onerror = () => {
-      es.close();
-      // Réessayer après 30 secondes si la connexion se coupe
-      setTimeout(demarrerNtfy, 30000);
-    };
+    es.onerror = () => { es.close(); setTimeout(demarrerNtfy, 30000); };
   } catch(err) {}
 }
